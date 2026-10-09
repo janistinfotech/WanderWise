@@ -1,0 +1,31 @@
+# Render Blueprint Infrastructure as Code (IaC)
+# Deploys WanderWise Web Service + Managed PostgreSQL Database
+
+services:
+  # Fullstack Web Application (Express API + React Vite SPA)
+  - type: web
+    name: wanderwise-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore # Low latency for Philippines / Asia Pacific
+    branch: main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wanderwise-db
+          property: connectionString
+
+databases:
+  # Managed PostgreSQL Database Service
+  - name: wanderwise-db
+    plan: free
+    region: singapore
+    databaseName: wanderwise
+    user: wanderwise

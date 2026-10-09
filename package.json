@@ -1,0 +1,31 @@
+{
+  "name": "wanderwise",
+  "version": "1.0.0",
+  "description": "WanderWise — Smart Travel Planner and Itinerary Management System",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run server:dev\" \"npm run client:dev\"",
+    "client:dev": "npm run --prefix client dev",
+    "server:dev": "npm run --prefix server dev",
+    "server:start": "npm run --prefix server start",
+    "client:build": "npm run --prefix client build",
+    "test": "npm run --prefix server test && npm run --prefix client test",
+    "test:server": "npm run --prefix server test",
+    "test:client": "npm run --prefix client test",
+    "lint": "npm run --prefix client lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "travel-planner",
+    "itinerary-management",
+    "devops",
+    "docker",
+    "ci-cd",
+    "wanderwise"
+  ],
+  "author": "WanderWise Team",
+  "license": "MIT"
+}
