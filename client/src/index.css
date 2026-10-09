@@ -4,11 +4,15 @@
 
 @layer base {
   body {
-    @apply bg-ivory-100 text-navy-900 font-sans antialiased transition-colors duration-300;
+    background-color: #FAF9F6;
+    color: #102A43;
+    font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+    @apply antialiased transition-colors duration-300;
   }
 
   .dark body, body.dark {
-    @apply bg-dark-bg text-slate-100;
+    background-color: #0A1322;
+    color: #f1f5f9;
   }
 }
 
