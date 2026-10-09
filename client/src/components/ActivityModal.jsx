@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { X, Calendar, Clock, MapPin, DollarSign, Tag, AlertCircle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const CATEGORIES = [
   { value: 'sightseeing', label: 'Sightseeing' },
@@ -81,19 +82,25 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/70 backdrop-blur-md overflow-y-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        transition={{ duration: 0.2 }}
+        className="bg-white dark:bg-dark-surface rounded-3xl shadow-2xl border border-slate-200 dark:border-dark-border w-full max-w-lg overflow-hidden my-8"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
-              {activityToEdit ? 'Edit Activity' : 'Add Activity to Itinerary'}
+            <h2 className="text-base font-black text-navy-900 dark:text-white">
+              {activityToEdit ? 'Edit Itinerary Activity' : 'Schedule New Activity'}
             </h2>
-            <p className="text-xs text-slate-500">Plan day activities and schedules</p>
+            <p className="text-xs text-slate-400 dark:text-dark-muted">Organize times, locations, and travel checklists</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-card transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -102,14 +109,14 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+            <div className="flex items-center gap-2 p-3 rounded-2xl bg-coral-50 dark:bg-coral-950/40 border border-coral-200 text-coral-700 dark:text-coral-300 text-xs font-bold">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
               Activity Name *
             </label>
             <input
@@ -118,13 +125,13 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
               placeholder="e.g., Kayaking in Big Lagoon"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+              className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Day Number
               </label>
               <input
@@ -133,12 +140,12 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
                 required
                 value={formData.day_number}
                 onChange={(e) => setFormData({ ...formData, day_number: parseInt(e.target.value, 10) || 1 })}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+                className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Time Slot
               </label>
               <div className="relative">
@@ -148,7 +155,7 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
                   placeholder="e.g., 09:30 AM"
                   value={formData.time_slot}
                   onChange={(e) => setFormData({ ...formData, time_slot: e.target.value })}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                 />
               </div>
             </div>
@@ -156,13 +163,13 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Category
               </label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500 bg-white"
+                className="w-full px-3 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -171,7 +178,7 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Est. Cost
               </label>
               <div className="relative">
@@ -183,14 +190,14 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
                   placeholder="0.00"
                   value={formData.estimated_cost}
                   onChange={(e) => setFormData({ ...formData, estimated_cost: e.target.value })}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-semibold"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
               Location
             </label>
             <div className="relative">
@@ -200,13 +207,13 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
                 placeholder="e.g., Bacuit Bay, El Nido"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+                className="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
               Notes & Tips
             </label>
             <textarea
@@ -214,29 +221,29 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
               placeholder="Bring dry bag, water shoes, reef-safe sunscreen..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+              className="w-full px-4 py-2 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-dark-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-50 transition"
+              className="px-4 py-2 rounded-2xl border border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-50 dark:hover:bg-dark-card transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-ocean-600 hover:bg-ocean-700 text-white font-semibold text-xs shadow-md shadow-ocean-500/20 transition disabled:opacity-50"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs shadow-md shadow-teal-500/20 transition disabled:opacity-50"
             >
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{activityToEdit ? 'Save Activity' : 'Add Activity'}</span>
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

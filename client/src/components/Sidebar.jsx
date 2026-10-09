@@ -10,12 +10,15 @@ import {
   Settings,
   X,
   LogOut,
-  Sparkles,
-  GitBranch
+  ChevronLeft,
+  ChevronRight,
+  GitBranch,
+  Sparkles
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { currentView, navigateTo } = useApp();
+  const { currentView, navigateTo, sidebarCollapsed, toggleSidebarCollapse } = useApp();
   const { logout } = useAuth();
 
   const navItems = [
@@ -38,93 +41,133 @@ export default function Sidebar({ isOpen, onClose }) {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-navy-950/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 w-64 bg-white border-r border-slate-200/90 flex flex-col z-40 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 bg-white dark:bg-dark-surface border-r border-slate-200/90 dark:border-dark-border flex flex-col z-40 transition-all duration-300 ease-in-out lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64`}
       >
         {/* Mobile Header */}
-        <div className="flex items-center justify-between p-4 lg:hidden border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-ocean-600 flex items-center justify-center text-white">
+        <div className="flex items-center justify-between p-4 lg:hidden border-b border-slate-100 dark:border-dark-border">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-teal-600 flex items-center justify-center text-white">
               <Compass className="w-4 h-4" />
             </div>
-            <span className="font-extrabold text-slate-800">WanderWise</span>
+            <span className="font-black text-navy-900 dark:text-white">WanderWise</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-card"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Sidebar Brand for desktop */}
-        <div className="hidden lg:flex items-center gap-3 px-6 py-6 border-b border-slate-100">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-ocean-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-ocean-500/20">
-            <Compass className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="font-black text-lg tracking-tight text-slate-900 leading-tight">WanderWise</h1>
-            <p className="text-[11px] font-semibold text-ocean-600">DevOps Week 7 Edition</p>
-          </div>
+        {/* Desktop Header */}
+        <div className={`hidden lg:flex items-center justify-between px-5 py-6 border-b border-slate-100 dark:border-dark-border ${sidebarCollapsed ? 'justify-center px-2' : ''}`}>
+          {!sidebarCollapsed && (
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-navy-900 to-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+                <Compass className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="font-black text-base tracking-tight text-navy-900 dark:text-white leading-tight">
+                  WanderWise
+                </h1>
+                <p className="text-[11px] font-bold text-teal-600 dark:text-teal-400">
+                  Luxury Travel SaaS
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Collapse Toggle */}
+          <button
+            onClick={toggleSidebarCollapse}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-card transition"
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
         </div>
 
         {/* Navigation Links */}
         <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
-          <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Main Menu
-          </div>
+          {!sidebarCollapsed && (
+            <div className="px-3 pb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-dark-muted">
+              Main Menu
+            </div>
+          )}
+
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
+
             return (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl font-bold text-xs transition-all relative group ${
                   isActive
-                    ? 'bg-ocean-50 text-ocean-700 shadow-sm border border-ocean-100/80 font-bold'
-                    : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
-                }`}
+                    ? 'bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 shadow-sm border border-teal-200/60 dark:border-teal-800/50'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-dark-card hover:text-navy-900 dark:hover:text-white'
+                } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+                title={sidebarCollapsed ? item.label : undefined}
               >
                 <Icon
-                  className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-ocean-600' : 'text-slate-400'
+                  className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                    isActive ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400 dark:text-dark-muted'
                   }`}
                 />
-                <span>{item.label}</span>
+                {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+
+                {/* Glowing Active indicator */}
+                {isActive && (
+                  <span className="absolute right-2.5 w-1.5 h-1.5 rounded-full bg-teal-500 shadow-glow-teal" />
+                )}
               </button>
             );
           })}
         </nav>
 
-        {/* DevOps & Version Badge Footer */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/60">
-          <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-sm mb-3">
-            <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
-              <span className="flex items-center gap-1.5">
-                <GitBranch className="w-3.5 h-3.5 text-ocean-600" />
-                <span>Build Status</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">
+        {/* Footer Build Spec & Sign Out */}
+        <div className="p-3 border-t border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card/50">
+          {!sidebarCollapsed ? (
+            <div className="p-3 rounded-2xl bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-dark-border shadow-soft mb-2">
+              <div className="flex items-center justify-between text-xs font-bold text-navy-900 dark:text-white mb-1">
+                <span className="flex items-center gap-1.5">
+                  <GitBranch className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                  <span>DevOps Platform</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-extrabold text-[10px] border border-teal-200/60 dark:border-teal-800/40">
+                  v1.0.0
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-400 dark:text-dark-muted">
+                Docker & CI/CD Pipeline
+              </p>
+            </div>
+          ) : (
+            <div className="flex justify-center mb-2" title="WanderWise v1.0.0">
+              <span className="px-1.5 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-black text-[9px]">
                 v1.0.0
               </span>
             </div>
-            <p className="text-[11px] text-slate-500">CI/CD & Docker Ready</p>
-          </div>
+          )}
 
           <button
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition border border-transparent hover:border-rose-100"
+            className={`w-full flex items-center gap-2 py-2.5 px-3 text-xs font-bold text-slate-500 hover:text-coral-600 hover:bg-coral-50 dark:hover:bg-coral-950/30 rounded-2xl transition ${
+              sidebarCollapsed ? 'justify-center px-2' : ''
+            }`}
+            title="Sign Out"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </aside>

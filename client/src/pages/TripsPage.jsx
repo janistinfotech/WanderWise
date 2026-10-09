@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
+import { TripsSkeleton } from '../components/SkeletonLoader';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import {
   Plane,
@@ -19,6 +20,7 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TripsPage() {
   const { navigateTo, openCreateTrip, openEditTrip, formatCurrency, showToast, refreshKey, triggerRefresh } = useApp();
@@ -66,29 +68,35 @@ export default function TripsPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-8 animate-fade-in pb-16">
       {/* Header and Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 text-xs font-extrabold mb-2 border border-teal-200/60 dark:border-teal-800/40">
+            <Plane className="w-3.5 h-3.5" />
+            <span>Travel Portfolio</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-black text-navy-900 dark:text-white tracking-tight">
             Trip Management
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Create, customize, and track all your travel itineraries and budgets
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-dark-muted mt-1">
+            Organize upcoming voyages, completed adventures, and ongoing Philippine itineraries
           </p>
         </div>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => openCreateTrip()}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-ocean-600 to-sky-500 hover:from-ocean-700 hover:to-sky-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md shadow-ocean-500/20 transition hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white font-extrabold text-xs px-6 py-3 rounded-2xl shadow-md shadow-teal-500/25 transition"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Create New Trip</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-soft flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-white dark:bg-dark-surface p-4 rounded-3xl border border-slate-200/90 dark:border-dark-border shadow-soft flex flex-col md:flex-row gap-4 items-center justify-between">
         {/* Status Tabs */}
         <div className="flex flex-wrap gap-1.5 w-full md:w-auto">
           {[
@@ -100,10 +108,10 @@ export default function TripsPage() {
             <button
               key={tab.id}
               onClick={() => setFilterStatus(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+              className={`px-4 py-2 rounded-2xl text-xs font-bold transition ${
                 filterStatus === tab.id
-                  ? 'bg-ocean-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-teal-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-card'
               }`}
             >
               {tab.label}
@@ -112,41 +120,38 @@ export default function TripsPage() {
         </div>
 
         {/* Search Input */}
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search by title or destination..."
+            placeholder="Search by trip title or destination..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
           />
         </div>
       </div>
 
       {/* Trips Content */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh]">
-          <Loader2 className="w-8 h-8 text-ocean-600 animate-spin mb-3" />
-          <p className="text-sm font-semibold text-slate-500">Loading trips...</p>
-        </div>
+        <TripsSkeleton />
       ) : trips.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 shadow-soft max-w-xl mx-auto my-8">
-          <div className="w-16 h-16 rounded-2xl bg-ocean-50 text-ocean-600 flex items-center justify-center mx-auto mb-4 border border-ocean-100">
+        <div className="p-12 text-center bg-white dark:bg-dark-surface rounded-3xl border border-slate-200 dark:border-dark-border shadow-soft max-w-xl mx-auto my-8">
+          <div className="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mx-auto mb-4 border border-teal-200/60 dark:border-teal-800/40">
             <Plane className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">No trips found</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mb-6">
+          <h3 className="text-lg font-black text-navy-900 dark:text-white mb-1">No trips found</h3>
+          <p className="text-xs text-slate-500 dark:text-dark-muted max-w-sm mx-auto mb-6">
             {searchQuery
               ? `No travel plans match "${searchQuery}". Try a different keyword.`
-              : `You don't have any ${filterStatus !== 'all' ? filterStatus : ''} trips yet. Let's create one now!`}
+              : `You have no ${filterStatus !== 'all' ? filterStatus : ''} trips listed yet. Let's create one now!`}
           </p>
           <button
             onClick={() => openCreateTrip()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-ocean-600 hover:bg-ocean-700 text-white text-xs font-bold rounded-xl shadow-md transition"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-2xl shadow-md transition"
           >
             <Plus className="w-4 h-4" />
-            <span>Create Trip</span>
+            <span>Create First Trip</span>
           </button>
         </div>
       ) : (
@@ -159,21 +164,22 @@ export default function TripsPage() {
             const percentSpent = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : 0;
 
             return (
-              <div
+              <motion.div
                 key={trip.id}
-                className="group bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between"
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className="group bg-white dark:bg-dark-surface rounded-3xl overflow-hidden border border-slate-200/90 dark:border-dark-border shadow-soft hover:shadow-card transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Image Banner */}
                 <div>
-                  <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
+                  <div className="relative aspect-[16/9] overflow-hidden bg-navy-900">
                     <img
                       src={trip.cover_image || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
                       alt={trip.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
                     />
 
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-transparent to-black/20" />
 
                     {/* Status Badge */}
                     <div className="absolute top-3 left-3">
@@ -183,7 +189,7 @@ export default function TripsPage() {
                             ? 'bg-purple-600/80 border-purple-400/40'
                             : isOngoing
                             ? 'bg-amber-600/80 border-amber-400/40'
-                            : 'bg-emerald-600/80 border-emerald-400/40'
+                            : 'bg-teal-600/80 border-teal-400/40'
                         }`}
                       >
                         {trip.status}
@@ -198,7 +204,7 @@ export default function TripsPage() {
                             e.stopPropagation();
                             setActiveMenuId(activeMenuId === trip.id ? null : trip.id);
                           }}
-                          className="p-1.5 rounded-full bg-white/80 hover:bg-white text-slate-700 backdrop-blur-md transition shadow-sm"
+                          className="p-1.5 rounded-full bg-white/80 dark:bg-navy-900/80 hover:bg-white text-slate-700 dark:text-slate-200 backdrop-blur-md transition shadow-sm"
                           aria-label="Trip actions"
                         >
                           <MoreVertical className="w-4 h-4" />
@@ -207,14 +213,14 @@ export default function TripsPage() {
                         {activeMenuId === trip.id && (
                           <div
                             onClick={(e) => e.stopPropagation()}
-                            className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-card border border-slate-200 py-1 z-30 animate-fade-in"
+                            className="absolute right-0 mt-1 w-36 bg-white dark:bg-dark-card rounded-2xl shadow-card border border-slate-200 dark:border-dark-border py-1.5 z-30 animate-fade-in"
                           >
                             <button
                               onClick={() => {
                                 setActiveMenuId(null);
                                 navigateTo('trip-detail', trip.id);
                               }}
-                              className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              className="w-full text-left px-3.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-dark-border flex items-center gap-2"
                             >
                               <Eye className="w-3.5 h-3.5 text-slate-400" />
                               <span>View Details</span>
@@ -224,20 +230,20 @@ export default function TripsPage() {
                                 setActiveMenuId(null);
                                 openEditTrip(trip);
                               }}
-                              className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              className="w-full text-left px-3.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-dark-border flex items-center gap-2"
                             >
                               <Edit2 className="w-3.5 h-3.5 text-slate-400" />
                               <span>Edit Details</span>
                             </button>
-                            <div className="border-t border-slate-100 my-1" />
+                            <div className="border-t border-slate-100 dark:border-dark-border my-1" />
                             <button
                               onClick={() => {
                                 setActiveMenuId(null);
                                 setTripToDelete(trip);
                               }}
-                              className="w-full text-left px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold"
+                              className="w-full text-left px-3.5 py-1.5 text-xs text-coral-600 hover:bg-coral-50 dark:hover:bg-coral-950/30 flex items-center gap-2 font-bold"
                             >
-                              <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                              <Trash2 className="w-3.5 h-3.5 text-coral-500" />
                               <span>Delete Trip</span>
                             </button>
                           </div>
@@ -247,8 +253,8 @@ export default function TripsPage() {
 
                     {/* Bottom Title on Image */}
                     <div className="absolute bottom-3 inset-x-3 text-white">
-                      <p className="text-xs font-semibold flex items-center gap-1 text-white/90 truncate">
-                        <MapPin className="w-3 h-3 text-ocean-400 flex-shrink-0" />
+                      <p className="text-xs font-semibold flex items-center gap-1 text-teal-300 truncate">
+                        <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{trip.destination}</span>
                       </p>
                     </div>
@@ -258,47 +264,46 @@ export default function TripsPage() {
                   <div className="p-5">
                     <h3
                       onClick={() => navigateTo('trip-detail', trip.id)}
-                      className="text-base font-bold text-slate-900 group-hover:text-ocean-600 transition-colors cursor-pointer line-clamp-1"
+                      className="text-base font-black text-navy-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition cursor-pointer line-clamp-1"
                     >
                       {trip.title}
                     </h3>
 
                     {trip.description && (
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-slate-500 dark:text-dark-muted mt-1 line-clamp-2 leading-relaxed">
                         {trip.description}
                       </p>
                     )}
 
                     {/* Dates & Activities info */}
-                    <div className="flex items-center justify-between text-xs text-slate-500 mt-4 pt-3 border-t border-slate-100">
-                      <div className="flex items-center gap-1.5">
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-dark-muted mt-4 pt-3 border-t border-slate-100 dark:border-dark-border">
+                      <div className="flex items-center gap-1.5 font-medium">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         <span>
-                          {trip.start_date ? trip.start_date.split('T')[0] : ''} to{' '}
-                          {trip.end_date ? trip.end_date.split('T')[0] : ''}
+                          {trip.start_date ? trip.start_date.split('T')[0] : ''}
                         </span>
                       </div>
-                      <span className="font-semibold text-ocean-600 text-[11px] bg-ocean-50 px-2 py-0.5 rounded-full">
+                      <span className="font-extrabold text-teal-700 dark:text-teal-300 text-[11px] bg-teal-50 dark:bg-teal-950/60 px-2.5 py-0.5 rounded-full border border-teal-200/50 dark:border-teal-800/40">
                         {trip.activity_count || 0} activities
                       </span>
                     </div>
 
                     {/* Budget bar indicator */}
                     <div className="mt-4">
-                      <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                        <span className="text-slate-500 text-[11px]">Budget Progress</span>
-                        <span className="text-slate-900 text-[11px]">
+                      <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+                        <span className="text-slate-400 dark:text-dark-muted text-[11px]">Budget Consumption</span>
+                        <span className="text-navy-900 dark:text-white text-[11px]">
                           {formatCurrency(spent)} / {formatCurrency(budget)}
                         </span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-dark-card overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
                             percentSpent > 100
-                              ? 'bg-rose-500'
+                              ? 'bg-coral-500'
                               : percentSpent > 80
                               ? 'bg-amber-500'
-                              : 'bg-ocean-500'
+                              : 'bg-teal-500'
                           }`}
                           style={{ width: `${percentSpent}%` }}
                         />
@@ -311,27 +316,27 @@ export default function TripsPage() {
                 <div className="p-5 pt-0 flex items-center gap-2">
                   <button
                     onClick={() => navigateTo('trip-detail', trip.id)}
-                    className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-ocean-50 hover:text-ocean-700 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5"
+                    className="flex-1 py-2.5 rounded-2xl bg-slate-100 dark:bg-dark-card hover:bg-teal-50 dark:hover:bg-teal-950/50 hover:text-teal-700 dark:hover:text-teal-300 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>View Itinerary</span>
                   </button>
                   <button
                     onClick={() => openEditTrip(trip)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                    className="p-2.5 rounded-2xl text-slate-400 hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-card transition"
                     title="Edit trip"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setTripToDelete(trip)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                    className="p-2.5 rounded-2xl text-slate-400 hover:text-coral-600 hover:bg-coral-50 dark:hover:bg-coral-950/30 transition"
                     title="Delete trip"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

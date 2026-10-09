@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import StatCard from '../components/StatCard';
+import { DashboardSkeleton } from '../components/SkeletonLoader';
 import {
   Plane,
   CalendarCheck,
@@ -18,24 +19,43 @@ import {
   ChevronRight,
   Calendar,
   AlertCircle,
-  Loader2
+  Heart,
+  Sun,
+  Timer
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { navigateTo, openCreateTrip, formatCurrency, refreshKey } = useApp();
+  const { navigateTo, openCreateTrip, formatCurrency, refreshKey, openDestinationDetail } = useApp();
 
   const [stats, setStats] = useState(null);
+  const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Determine dynamic time-of-day greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   useEffect(() => {
-    async function fetchStats() {
+    async function loadData() {
       setLoading(true);
       try {
-        const res = await api.dashboard.getStats();
-        if (res.success) {
-          setStats(res.stats);
+        const [statsRes, destRes] = await Promise.all([
+          api.dashboard.getStats(),
+          api.destinations.getAll().catch(() => ({ success: false, destinations: [] }))
+        ]);
+
+        if (statsRes.success) {
+          setStats(statsRes.stats);
+        }
+        if (destRes.success) {
+          setDestinations(destRes.destinations.slice(0, 4));
         }
       } catch (err) {
         setError(err.message || 'Failed to load dashboard metrics.');
@@ -43,27 +63,22 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-    fetchStats();
+    loadData();
   }, [refreshKey]);
 
   if (loading && !stats) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 text-ocean-600 animate-spin mb-3" />
-        <p className="text-sm font-semibold text-slate-500">Loading your travel dashboard...</p>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-rose-50 border border-rose-200 rounded-3xl text-rose-800 max-w-lg mx-auto my-12 text-center">
-        <AlertCircle className="w-8 h-8 mx-auto mb-2 text-rose-600" />
+      <div className="p-8 bg-coral-50 dark:bg-coral-950/40 border border-coral-200 dark:border-coral-800 rounded-3xl text-coral-800 dark:text-coral-200 max-w-lg mx-auto my-12 text-center">
+        <AlertCircle className="w-8 h-8 mx-auto mb-2 text-coral-600 dark:text-coral-400" />
         <h3 className="font-bold text-base mb-1">Could not load dashboard</h3>
-        <p className="text-xs text-rose-600 mb-4">{error}</p>
+        <p className="text-xs text-coral-600 dark:text-coral-300 mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold"
+          className="px-5 py-2.5 bg-coral-600 text-white rounded-2xl text-xs font-extrabold shadow-md"
         >
           Retry
         </button>
@@ -83,114 +98,288 @@ export default function DashboardPage() {
     recentTrips = []
   } = stats || {};
 
+  // Find next upcoming trip for countdown
+  const nextTrip = recentTrips.find((t) => t.status === 'upcoming') || recentTrips[0];
+
+  // Calculate days countdown
+  let daysUntilNext = null;
+  if (nextTrip && nextTrip.start_date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tripDate = new Date(nextTrip.start_date);
+    tripDate.setHours(0, 0, 0, 0);
+    const diffTime = tripDate - today;
+    daysUntilNext = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  const budgetUsagePercent = totalEstimatedBudget > 0
+    ? Math.min(100, Math.round((totalSpent / totalEstimatedBudget) * 100))
+    : 0;
+
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-ocean-700 via-sky-600 to-teal-600 p-8 sm:p-10 text-white shadow-xl shadow-ocean-500/15">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold mb-3 border border-white/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Welcome back, {user?.name || 'Traveler'}!</span>
+    <div className="space-y-8 animate-fade-in pb-16">
+      {/* 1. SCENIC HERO BENTO BANNER */}
+      <div className="relative overflow-hidden rounded-3xl bg-navy-900 border border-navy-800/80 shadow-card text-white">
+        {/* Background Scenic Image with Dark Gradient Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=1600&q=80"
+            alt="Palawan Tropical Escapade"
+            className="w-full h-full object-cover opacity-45 scale-105 transform hover:scale-100 transition-transform duration-1000"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-navy-950/95 via-navy-950/70 to-navy-900/40" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 p-8 sm:p-10 lg:p-12 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-500/20 backdrop-blur-md text-teal-300 text-xs font-bold mb-4 border border-teal-400/30">
+            <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+            <span>{getGreeting()}, {user?.name || 'Explorer'}!</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-            Ready to explore your next horizon?
+
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.1] text-white">
+            Where will your next{' '}
+            <span className="bg-gradient-to-r from-teal-400 via-teal-300 to-coral-400 bg-clip-text text-transparent">
+              story unfold?
+            </span>
           </h1>
-          <p className="text-white/85 text-xs sm:text-sm mt-2 font-medium leading-relaxed">
-            You currently have <strong className="text-white font-bold">{upcomingTrips} upcoming</strong> trips and{' '}
-            <strong className="text-white font-bold">{upcomingActivities.length} itinerary activities</strong> on your schedule.
+
+          <p className="text-slate-300 text-xs sm:text-sm mt-3.5 font-medium leading-relaxed max-w-xl">
+            You have <strong className="text-white font-bold">{upcomingTrips} upcoming journeys</strong> and{' '}
+            <strong className="text-white font-bold">{upcomingActivities.length} scheduled itinerary stops</strong>. Experience seamless itinerary curation and budget precision.
           </p>
 
-          {/* Quick CTA inside banner */}
-          <div className="flex flex-wrap items-center gap-3 mt-6">
-            <button
+          {/* Quick Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3 mt-7">
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => openCreateTrip()}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-ocean-800 hover:bg-slate-50 font-bold text-xs shadow-md transition hover:scale-105"
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-extrabold text-xs shadow-lg shadow-teal-500/25 transition"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>Plan New Trip</span>
-            </button>
-            <button
+              <span>Create New Trip</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => navigateTo('destinations')}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-ocean-800/40 hover:bg-ocean-800/60 text-white border border-white/25 font-bold text-xs transition"
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 font-bold text-xs transition"
             >
-              <Compass className="w-4 h-4" />
+              <Compass className="w-4 h-4 text-teal-300" />
               <span>Explore Philippines</span>
-            </button>
+            </motion.button>
           </div>
         </div>
 
-        {/* Decorative Compass watermark */}
-        <Compass className="absolute right-[-20px] bottom-[-30px] w-64 h-64 text-white/10 pointer-events-none transform rotate-12" />
+        {/* Ambient Badge */}
+        <div className="absolute right-6 top-6 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 text-[11px] text-white/80 font-bold">
+          <Sun className="w-3.5 h-3.5 text-amber-400" />
+          <span>Tropical Travel Season</span>
+        </div>
       </div>
 
-      {/* Metrics Row */}
+      {/* 2. BENTO STATS ROW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Total Planned Trips"
           value={totalTrips}
-          subtitle={`${upcomingTrips} upcoming • ${completedTrips} done`}
+          subtitle={`${upcomingTrips} upcoming • ${completedTrips} completed`}
           icon={Plane}
-          color="ocean"
+          color="teal"
+          delay={0}
           onClick={() => navigateTo('trips')}
         />
         <StatCard
-          title="Upcoming Trips"
+          title="Upcoming Departures"
           value={upcomingTrips}
-          subtitle={ongoingTrips > 0 ? `${ongoingTrips} currently ongoing` : 'Ready to depart'}
+          subtitle={ongoingTrips > 0 ? `${ongoingTrips} in progress right now` : 'Ready for boarding'}
           icon={CalendarCheck}
-          color="emerald"
+          color="coral"
+          delay={0.05}
           onClick={() => navigateTo('trips')}
         />
         <StatCard
-          title="Completed Trips"
+          title="Completed Journeys"
           value={completedTrips}
-          subtitle="Memories captured"
+          subtitle="Precious travel memories"
           icon={CheckCircle}
           color="purple"
+          delay={0.1}
           onClick={() => navigateTo('trips')}
         />
         <StatCard
-          title="Total Travel Budget"
+          title="Travel Budget Cap"
           value={formatCurrency(totalEstimatedBudget)}
-          subtitle={`${formatCurrency(totalSpent)} spent recorded`}
+          subtitle={`${formatCurrency(totalSpent)} total spent recorded`}
           icon={Wallet}
           color="amber"
+          delay={0.15}
           onClick={() => navigateTo('budget')}
         />
       </div>
 
-      {/* Main Grid: Upcoming Activities & Recent Trips */}
+      {/* 3. BENTO GRID: NEXT TRIP COUNTDOWN & ACTIVE SCHEDULE */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Upcoming Activities Timeline (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-soft">
+        {/* Left Column: Next Trip Countdown Showcase (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          {nextTrip ? (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white dark:bg-dark-surface rounded-3xl p-6 sm:p-7 border border-slate-200/90 dark:border-dark-border shadow-soft relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-extrabold uppercase tracking-widest text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
+                  <Timer className="w-4 h-4" />
+                  <span>Next Departure Countdown</span>
+                </span>
+                <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/40">
+                  {nextTrip.status}
+                </span>
+              </div>
+
+              {/* Cover Card */}
+              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-5 bg-navy-900 shadow-md">
+                <img
+                  src={nextTrip.cover_image || 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=600&q=80'}
+                  alt={nextTrip.title}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-transparent to-transparent" />
+
+                {/* Countdown Badge overlay */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                  <div>
+                    <p className="text-[11px] text-teal-300 font-bold flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      <span>{nextTrip.destination}</span>
+                    </p>
+                    <h3 className="text-base font-black truncate">{nextTrip.title}</h3>
+                  </div>
+
+                  {daysUntilNext !== null && (
+                    <div className="text-right bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
+                      <span className="text-xl font-black text-coral-400 block leading-tight">
+                        {daysUntilNext > 0 ? daysUntilNext : 0}
+                      </span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-white/80 block">
+                        Days Left
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Trip stats */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-dark-card border border-slate-100 dark:border-dark-border">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-dark-muted block">
+                    Departure Date
+                  </span>
+                  <span className="text-xs font-bold text-navy-900 dark:text-white mt-0.5 block">
+                    {nextTrip.start_date ? nextTrip.start_date.split('T')[0] : 'TBD'}
+                  </span>
+                </div>
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-dark-card border border-slate-100 dark:border-dark-border">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-dark-muted block">
+                    Estimated Budget
+                  </span>
+                  <span className="text-xs font-black text-teal-600 dark:text-teal-400 mt-0.5 block">
+                    {formatCurrency(nextTrip.estimated_budget)}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigateTo('trip-detail', nextTrip.id)}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-navy-900 dark:bg-teal-600 hover:bg-navy-800 dark:hover:bg-teal-700 text-white font-extrabold text-xs shadow-md transition"
+              >
+                <span>View Full Itinerary & Timeline</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </motion.div>
+          ) : (
+            <div className="p-8 text-center bg-white dark:bg-dark-surface rounded-3xl border border-slate-200/90 dark:border-dark-border">
+              <Plane className="w-12 h-12 text-slate-300 dark:text-dark-muted mx-auto mb-3" />
+              <h4 className="font-bold text-sm text-navy-900 dark:text-white">No upcoming trips</h4>
+              <p className="text-xs text-slate-500 dark:text-dark-muted mt-1 mb-4">
+                Start by creating your first Philippine travel itinerary.
+              </p>
+              <button
+                onClick={() => openCreateTrip()}
+                className="px-5 py-2.5 bg-teal-600 text-white rounded-2xl text-xs font-bold shadow-md"
+              >
+                + Plan New Trip
+              </button>
+            </div>
+          )}
+
+          {/* Budget Health Card */}
+          <div className="bg-white dark:bg-dark-surface rounded-3xl p-6 border border-slate-200/90 dark:border-dark-border shadow-soft">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-navy-900 dark:text-white">
+                Total Budget Utilization
+              </h4>
+              <span className="text-xs font-bold text-teal-600 dark:text-teal-400">
+                {budgetUsagePercent}% Used
+              </span>
+            </div>
+
+            <div className="w-full h-3 rounded-full bg-slate-100 dark:bg-dark-card overflow-hidden mb-3">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${
+                  budgetUsagePercent > 90 ? 'bg-coral-500' : 'bg-teal-500'
+                }`}
+                style={{ width: `${budgetUsagePercent}%` }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-dark-muted">
+              <span>{formatCurrency(totalSpent)} spent</span>
+              <span className="font-bold text-navy-900 dark:text-white">
+                {formatCurrency(totalRemainingBudget)} remaining
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Upcoming Activities Timeline (7 cols) */}
+        <div className="lg:col-span-7 bg-white dark:bg-dark-surface rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-dark-border shadow-soft">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-base font-bold text-slate-900 tracking-tight">
+              <h3 className="text-base font-black text-navy-900 dark:text-white tracking-tight">
                 Upcoming Itinerary Activities
-              </h2>
-              <p className="text-xs text-slate-500">Your scheduled plans across active trips</p>
+              </h3>
+              <p className="text-xs text-slate-400 dark:text-dark-muted mt-0.5">
+                Next scheduled checkpoints across your trips
+              </p>
             </div>
             <button
               onClick={() => navigateTo('itinerary')}
-              className="text-xs font-bold text-ocean-600 hover:text-ocean-700 flex items-center gap-1 group"
+              className="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 group"
             >
-              <span>View All</span>
+              <span>View Itinerary</span>
               <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
 
           {upcomingActivities.length === 0 ? (
-            <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-              <CalendarCheck className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm font-bold text-slate-700">No scheduled activities yet</p>
-              <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-                Add daily tours, restaurant visits, or travel stops to your trip itineraries.
+            <div className="p-8 text-center bg-slate-50 dark:bg-dark-card rounded-2xl border border-dashed border-slate-200 dark:border-dark-border">
+              <CalendarCheck className="w-10 h-10 text-slate-300 dark:text-dark-muted mx-auto mb-2" />
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                No scheduled activities yet
+              </p>
+              <p className="text-[11px] text-slate-400 dark:text-dark-muted mt-1 max-w-xs mx-auto">
+                Add daily tours, restaurant reservations, or beach excursions to your trip.
               </p>
               <button
                 onClick={() => navigateTo('trips')}
-                className="mt-4 px-4 py-2 bg-ocean-600 text-white rounded-xl text-xs font-bold shadow-sm"
+                className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold shadow-sm"
               >
-                Go to Trips
+                Open Trips
               </button>
             </div>
           ) : (
@@ -199,32 +388,33 @@ export default function DashboardPage() {
                 <div
                   key={act.id}
                   onClick={() => navigateTo('trip-detail', act.trip_id)}
-                  className="flex items-start gap-3.5 p-3.5 rounded-2xl border border-slate-100 hover:border-ocean-200 bg-slate-50/50 hover:bg-ocean-50/30 transition-all cursor-pointer group"
+                  className="flex items-start gap-4 p-4 rounded-2xl border border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card/50 hover:bg-teal-50/40 dark:hover:bg-teal-950/20 hover:border-teal-200 dark:hover:border-teal-800 transition cursor-pointer group"
                 >
-                  <div className="p-2.5 rounded-xl bg-white text-ocean-600 border border-slate-200/80 shadow-sm flex-shrink-0 group-hover:bg-ocean-600 group-hover:text-white transition-colors">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-dark-surface text-teal-600 dark:text-teal-400 border border-slate-200/80 dark:border-dark-border shadow-sm flex-shrink-0 group-hover:bg-teal-600 group-hover:text-white transition">
                     <Clock className="w-4 h-4" />
                   </div>
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-ocean-700 transition-colors">
+                      <h4 className="text-xs sm:text-sm font-bold text-navy-900 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition">
                         {act.title}
                       </h4>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 flex-shrink-0">
+                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-dark-surface text-slate-600 dark:text-slate-300 flex-shrink-0">
                         {act.time_slot}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500">
-                      <span className="font-semibold text-ocean-600 truncate max-w-[150px]">
+                    <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-500 dark:text-dark-muted">
+                      <span className="font-semibold text-teal-600 dark:text-teal-400 truncate max-w-[160px]">
                         {act.trip_title}
                       </span>
                       {act.location && (
-                        <span className="flex items-center gap-1 text-slate-400">
+                        <span className="flex items-center gap-1 text-slate-400 dark:text-slate-400">
                           • <MapPin className="w-3 h-3" /> {act.location}
                         </span>
                       )}
                       {act.estimated_cost > 0 && (
-                        <span className="text-slate-600 font-semibold">
+                        <span className="font-bold text-slate-700 dark:text-slate-300">
                           • {formatCurrency(act.estimated_cost)}
                         </span>
                       )}
@@ -234,111 +424,41 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-        </div>
 
-        {/* Right Column: Recent Travel Plans (5 cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-soft">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 tracking-tight">
-                Recent Travel Plans
-              </h2>
-              <p className="text-xs text-slate-500">Overview of trips in progress</p>
-            </div>
-            <button
-              onClick={() => navigateTo('trips')}
-              className="text-xs font-bold text-ocean-600 hover:text-ocean-700 flex items-center gap-1 group"
-            >
-              <span>All Trips</span>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </div>
-
-          {recentTrips.length === 0 ? (
-            <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-              <Plane className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm font-bold text-slate-700">No trips created yet</p>
-              <p className="text-xs text-slate-500 mt-1">Start planning your first getaway!</p>
+          {/* Destination Previews in Dashboard */}
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-dark-border">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-xs font-black uppercase tracking-wider text-navy-900 dark:text-white">
+                Philippine Destinations Inspiration
+              </h4>
               <button
-                onClick={() => openCreateTrip()}
-                className="mt-4 px-4 py-2 bg-ocean-600 text-white rounded-xl text-xs font-bold shadow-sm"
+                onClick={() => navigateTo('destinations')}
+                className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline"
               >
-                + Create Trip
+                View all ({destinations.length}+)
               </button>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {recentTrips.map((trip) => {
-                const isCompleted = trip.status === 'completed';
-                const isOngoing = trip.status === 'ongoing';
 
-                return (
-                  <div
-                    key={trip.id}
-                    onClick={() => navigateTo('trip-detail', trip.id)}
-                    className="flex items-center gap-4 p-3 rounded-2xl border border-slate-100 hover:border-slate-300 hover:shadow-sm transition cursor-pointer group"
-                  >
-                    <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100">
-                      <img
-                        src={trip.cover_image || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80'}
-                        alt={trip.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
-                            isCompleted
-                              ? 'bg-purple-50 text-purple-700 border border-purple-200'
-                              : isOngoing
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          }`}
-                        >
-                          {trip.status}
-                        </span>
-                        <span className="text-[11px] text-slate-400 truncate">
-                          {trip.destination}
-                        </span>
-                      </div>
-
-                      <h4 className="text-sm font-bold text-slate-900 truncate mt-1 group-hover:text-ocean-600 transition-colors">
-                        {trip.title}
-                      </h4>
-
-                      <div className="flex items-center justify-between text-xs text-slate-500 mt-1">
-                        <span className="flex items-center gap-1 text-[11px]">
-                          <Calendar className="w-3 h-3 text-slate-400" />
-                          {trip.start_date ? trip.start_date.split('T')[0] : ''}
-                        </span>
-                        <span className="font-bold text-slate-800 text-[11px]">
-                          {formatCurrency(trip.estimated_budget)}
-                        </span>
-                      </div>
-                    </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {destinations.map((d) => (
+                <div
+                  key={d.id}
+                  onClick={() => openDestinationDetail(d)}
+                  className="group relative rounded-2xl overflow-hidden aspect-[4/3] bg-navy-900 cursor-pointer shadow-sm hover:shadow-md transition"
+                >
+                  <img
+                    src={d.image_url}
+                    alt={d.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-90"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-2 inset-x-2 text-white">
+                    <p className="text-[11px] font-bold truncate leading-tight">{d.name.split(',')[0]}</p>
+                    <span className="text-[9px] text-teal-300 block">{d.region}</span>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
-          )}
-
-          {/* Quick Explore Philippine Link */}
-          <div className="mt-6 p-4 rounded-2xl bg-ocean-50/70 border border-ocean-100 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Compass className="w-5 h-5 text-ocean-600" />
-              <div>
-                <p className="text-xs font-bold text-ocean-900">Destination Inspiration</p>
-                <p className="text-[10px] text-ocean-700">Explore Palawan, Batangas, Baguio & more</p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigateTo('destinations')}
-              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-ocean-700 hover:bg-ocean-100 border border-ocean-200 shadow-sm transition"
-            >
-              Explore
-            </button>
           </div>
         </div>
       </div>
