@@ -1,6 +1,12 @@
+const crypto = require('node:crypto');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'wanderwise_super_secret_jwt_key_2026';
+// Production must always provide JWT_SECRET. Local development receives an
+// ephemeral value instead of relying on a password-like secret in source code.
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is required when NODE_ENV=production.');
+}
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(48).toString('hex');
 
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;

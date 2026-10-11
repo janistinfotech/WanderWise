@@ -169,7 +169,12 @@ WanderWise/
 Run the full production-mirrored multi-container stack (PostgreSQL + Express + Nginx):
 
 1. **Start all services with Docker Compose:**
+   Copy `.env.example` to `.env`, then assign strong local values to
+   `POSTGRES_PASSWORD` and `JWT_SECRET`. The completed `.env` file is ignored
+   by Git and must never be committed.
+
    ```bash
+   cp .env.example .env
    docker compose up --build
    ```
 
@@ -194,7 +199,7 @@ To test the unified production container (used for Render deployment):
 docker build -t wanderwise:v1.0.0 .
 
 # Run container
-docker run -p 5000:5000 -e PORT=5000 -e JWT_SECRET=mysecretkey wanderwise:v1.0.0
+docker run -p 5000:5000 -e PORT=5000 -e JWT_SECRET="<your-generated-secret>" wanderwise:v1.1.0
 
 # Verify
 curl http://localhost:5000/api/health
@@ -274,7 +279,17 @@ Per evaluation requirements, WanderWise is structured for an immediate demonstra
 | `Port 5000 in use` | Another process is using port 5000 | Kill existing process or set `PORT=5001` in `.env` |
 | `PostgreSQL connection refused` | Local Postgres is not running | App automatically falls back to local SQLite in development mode |
 | `Docker command not found` | Docker Desktop is not installed or running | Install Docker Desktop or run via standard Node mode (`npm run dev`) |
+| Docker Compose reports a required variable is missing | Root `.env` has not been configured | Copy `.env.example` to `.env`, then set strong values for `POSTGRES_PASSWORD` and `JWT_SECRET` |
 | `GitHub Actions Deploy skipped` | `RENDER_DEPLOY_HOOK_URL` secret missing | Add secret under Repo Settings -> Secrets & Variables -> Actions |
+
+### Security note
+
+The public demo credentials are intentionally published for evaluator access and
+must never be reused for a personal or administrative account. Production JWT,
+database, and deployment credentials are supplied only through Render environment
+variables and GitHub Actions secrets. If a scanner reports the documented demo
+login, review it as a demo-only false positive; rotate any alert that points to an
+actual environment credential.
 
 ---
 
