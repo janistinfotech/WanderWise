@@ -177,6 +177,12 @@ async function query(text, params = []) {
     // SQLite adapter
     // Replace $1, $2, etc with ?
     let convertedText = text.replace(/\$([0-9]+)/g, '?');
+    // node:sqlite accepts numeric SQLite booleans, while PostgreSQL expects
+    // native JavaScript booleans. Normalize only at the SQLite boundary so
+    // controllers can remain database-agnostic.
+    const convertedParams = params.map((value) => (
+      typeof value === 'boolean' ? (value ? 1 : 0) : value
+    ));
 
     // Check if query is returning data
     const isSelect = /^\s*SELECT/i.test(convertedText);
@@ -185,10 +191,10 @@ async function query(text, params = []) {
     try {
       const stmt = dbClient.prepare(convertedText);
       if (isSelect || hasReturning) {
-        const rows = stmt.all(...params);
+        const rows = stmt.all(...convertedParams);
         return { rows, rowCount: rows.length };
       } else {
-        const info = stmt.run(...params);
+        const info = stmt.run(...convertedParams);
         return { rows: [], rowCount: info.changes, lastInsertRowid: info.lastInsertRowid };
       }
     } catch (err) {
