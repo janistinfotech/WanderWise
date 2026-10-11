@@ -1,5 +1,5 @@
 # Multi-stage / Production Dockerfile for WanderWise Backend API
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 

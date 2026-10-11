@@ -1,7 +1,7 @@
 # Fullstack Production Dockerfile for WanderWise (Unified Container)
 # Builds Vite client and serves via Express Backend with PostgreSQL support
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY client/ ./client/
 RUN cd client && npm run build
 
 # Stage 2: Production Runner
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 RUN apk --no-cache add curl

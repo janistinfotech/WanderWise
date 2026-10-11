@@ -125,7 +125,7 @@ WanderWise/
 ## 🚀 Getting Started Locally
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) v20 or higher
+- [Node.js](https://nodejs.org/) v22 or higher (required for the built-in SQLite fallback)
 - [Git](https://git-scm.com/)
 - [Docker Desktop](https://www.docker.com/) *(optional for direct local node run, required for container run)*
 
