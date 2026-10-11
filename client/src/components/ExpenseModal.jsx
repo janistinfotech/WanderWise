@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { X, DollarSign, Calendar, Tag, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { useApp } from '../context/AppContext';
+import { X, Calendar, Tag, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const CATEGORIES = [
@@ -12,6 +13,7 @@ const CATEGORIES = [
 ];
 
 export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, onSaved }) {
+  const { currencySymbol } = useApp();
   const [formData, setFormData] = useState({
     trip_id: tripId,
     category: 'transportation',
@@ -145,7 +147,9 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
                 Amount *
               </label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <span className="absolute left-3 top-2.5 text-sm font-bold text-slate-400" aria-hidden="true">
+                  {currencySymbol}
+                </span>
                 <input
                   id="expense-amount"
                   name="amount"

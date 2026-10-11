@@ -2,6 +2,14 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useAuth } from './AuthContext';
 import { api } from '../services/api';
 
+const CURRENCY_SYMBOLS = {
+  PHP: '₱',
+  USD: '$',
+  EUR: '€',
+  JPY: '¥',
+  SGD: 'S$',
+};
+
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
@@ -157,14 +165,12 @@ export function AppProvider({ children }) {
   const formatCurrency = useCallback((amount, overrideCurrency = null) => {
     const num = parseFloat(amount || 0);
     const currency = overrideCurrency || user?.currency || 'PHP';
-    let symbol = '₱';
-    if (currency === 'USD') symbol = '$';
-    if (currency === 'EUR') symbol = '€';
-    if (currency === 'JPY') symbol = '¥';
-    if (currency === 'SGD') symbol = 'S$';
+    const symbol = CURRENCY_SYMBOLS[currency] || CURRENCY_SYMBOLS.PHP;
 
     return `${symbol}${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }, [user?.currency]);
+
+  const currencySymbol = CURRENCY_SYMBOLS[user?.currency] || CURRENCY_SYMBOLS.PHP;
 
   return (
     <AppContext.Provider
@@ -179,6 +185,7 @@ export function AppProvider({ children }) {
         refreshKey,
         triggerRefresh,
         formatCurrency,
+        currencySymbol,
         tripModalOpen,
         tripToEdit,
         prefilledDestination,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
-import { X, Plane, Calendar, DollarSign, Image as ImageIcon, MapPin, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Plane, Calendar, Image as ImageIcon, MapPin, AlertCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const COVER_IMAGE_PRESETS = [
@@ -14,7 +14,7 @@ const COVER_IMAGE_PRESETS = [
 ];
 
 export default function TripModal() {
-  const { tripModalOpen, tripToEdit, prefilledDestination, closeTripModal, showToast, triggerRefresh } = useApp();
+  const { tripModalOpen, tripToEdit, prefilledDestination, closeTripModal, showToast, triggerRefresh, currencySymbol } = useApp();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -224,7 +224,9 @@ export default function TripModal() {
                 Estimated Budget
               </label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <span className="absolute left-3.5 top-2.5 text-sm font-bold text-slate-400" aria-hidden="true">
+                  {currencySymbol}
+                </span>
                 <input
                   type="number"
                   name="estimated_budget"

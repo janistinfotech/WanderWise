@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { X, Calendar, Clock, MapPin, DollarSign, Tag, AlertCircle, Loader2 } from 'lucide-react';
+import { useApp } from '../context/AppContext';
+import { X, Calendar, Clock, MapPin, Tag, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const CATEGORIES = [
@@ -13,6 +14,7 @@ const CATEGORIES = [
 ];
 
 export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit, defaultDay = 1, onSaved }) {
+  const { currencySymbol } = useApp();
   const [formData, setFormData] = useState({
     trip_id: tripId,
     day_number: defaultDay,
@@ -182,7 +184,9 @@ export default function ActivityModal({ isOpen, onClose, tripId, activityToEdit,
                 Est. Cost
               </label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <span className="absolute left-3 top-2.5 text-sm font-bold text-slate-400" aria-hidden="true">
+                  {currencySymbol}
+                </span>
                 <input
                   type="number"
                   min="0"
