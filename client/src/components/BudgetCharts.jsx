@@ -19,7 +19,6 @@ export default function BudgetCharts({ budget }) {
 
   const { estimatedBudget, totalSpent, remainingBudget, percentSpent, categoryBreakdown } = budget;
 
-  let accumulatedPercent = 0;
   const radius = 64;
   const circumference = 2 * Math.PI * radius;
   const validCategories = categoryBreakdown.filter((c) => c.amount > 0);
@@ -38,7 +37,7 @@ export default function BudgetCharts({ budget }) {
         </div>
 
         <div className="relative flex items-center justify-center py-6">
-          <svg className="w-52 h-52 transform -rotate-90" viewBox="0 0 160 160">
+          <svg className="w-52 h-52 transform -rotate-90 origin-center" viewBox="0 0 160 160">
             {/* Background Ring */}
             <circle
               cx="80"
@@ -62,11 +61,13 @@ export default function BudgetCharts({ budget }) {
                 strokeDasharray={`${circumference} ${circumference}`}
                 fill="transparent"
               />
-            ) : (
-              validCategories.map((item) => {
+            ) : (() => {
+              let runningOffset = 0;
+              return validCategories.map((item) => {
                 const config = CATEGORY_CONFIG[item.category] || CATEGORY_CONFIG.other;
                 const slicePercent = totalSpent > 0 ? item.amount / totalSpent : 0;
-                accumulatedPercent += slicePercent;
+                const currentStrokeOffset = -circumference * runningOffset;
+                runningOffset += slicePercent;
                 const isHovered = hoveredCategory === item.category;
 
                 return (
@@ -79,14 +80,14 @@ export default function BudgetCharts({ budget }) {
                     strokeWidth={isHovered ? '24' : '20'}
                     fill="transparent"
                     strokeDasharray={`${circumference * slicePercent} ${circumference * (1 - slicePercent)}`}
-                    strokeDashoffset={-circumference * (accumulatedPercent - slicePercent)}
+                    strokeDashoffset={currentStrokeOffset}
                     onMouseEnter={() => setHoveredCategory(item.category)}
                     onMouseLeave={() => setHoveredCategory(null)}
                     className="transition-all duration-300 ease-out cursor-pointer hover:opacity-90"
                   />
                 );
-              })
-            )}
+              });
+            })()}
           </svg>
 
           {/* Centered Donut Label */}

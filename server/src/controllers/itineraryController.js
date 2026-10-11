@@ -66,7 +66,7 @@ async function createActivity(req, res) {
         notes ? notes.trim() : '',
         parseFloat(estimated_cost) || 0,
         category || 'sightseeing',
-        0
+        false
       ]
     );
 
@@ -131,7 +131,7 @@ async function updateActivity(req, res) {
         notes !== undefined ? notes : null,
         estimated_cost !== undefined ? parseFloat(estimated_cost) : null,
         category || null,
-        is_completed !== undefined ? (is_completed ? 1 : 0) : null,
+        is_completed !== undefined ? Boolean(is_completed) : null,
         activityId
       ]
     );

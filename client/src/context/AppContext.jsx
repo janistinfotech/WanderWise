@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { api } from '../services/api';
 
 const AppContext = createContext(null);
 
@@ -106,6 +107,23 @@ export function AppProvider({ children }) {
     }, 4000);
   }, []);
 
+  const toggleFavoriteDestination = useCallback(async (destId) => {
+    try {
+      const res = await api.destinations.toggleFavorite(destId);
+      if (res.success) {
+        setSelectedDestination((prev) =>
+          prev && prev.id === destId ? { ...prev, is_favorite: res.is_favorite } : prev
+        );
+        showToast(res.message, 'success');
+        setRefreshKey((k) => k + 1);
+        return res;
+      }
+    } catch (err) {
+      showToast(err.message || 'Failed to update favorite', 'error');
+      throw err;
+    }
+  }, [showToast]);
+
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
@@ -136,9 +154,9 @@ export function AppProvider({ children }) {
     setPrefilledDestination(null);
   }, []);
 
-  const formatCurrency = useCallback((amount) => {
+  const formatCurrency = useCallback((amount, overrideCurrency = null) => {
     const num = parseFloat(amount || 0);
-    const currency = user?.currency || 'PHP';
+    const currency = overrideCurrency || user?.currency || 'PHP';
     let symbol = '₱';
     if (currency === 'USD') symbol = '$';
     if (currency === 'EUR') symbol = '€';
@@ -182,6 +200,7 @@ export function AppProvider({ children }) {
         selectedDestination,
         openDestinationDetail,
         closeDestinationDetail,
+        toggleFavoriteDestination,
       }}
     >
       {children}

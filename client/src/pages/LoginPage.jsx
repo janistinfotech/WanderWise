@@ -148,12 +148,13 @@ export default function LoginPage({ onGoRegister, onGoLanding }) {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Email Address
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                 <input
+                  id="login-email"
                   type="email"
                   required
                   placeholder="you@wanderwise.com"
@@ -165,12 +166,13 @@ export default function LoginPage({ onGoRegister, onGoLanding }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Password
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="••••••••"

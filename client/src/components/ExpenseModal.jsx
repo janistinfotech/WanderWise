@@ -46,6 +46,17 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
     setError('');
   }, [expenseToEdit, tripId, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -93,7 +104,10 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
             <p className="text-xs text-slate-400 dark:text-dark-muted">Log receipts and track budget utilization</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close modal"
+            title="Close modal"
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-card transition"
           >
             <X className="w-5 h-5" />
@@ -110,10 +124,12 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
           )}
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+            <label htmlFor="expense-description" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
               Description *
             </label>
             <input
+              id="expense-description"
+              name="description"
               type="text"
               required
               placeholder="e.g., Roundtrip Ferry, Grilled Seafood, Resort Deposit"
@@ -125,12 +141,14 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+              <label htmlFor="expense-amount" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Amount *
               </label>
               <div className="relative">
                 <DollarSign className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
+                  id="expense-amount"
+                  name="amount"
                   type="number"
                   min="0.01"
                   step="0.01"
@@ -144,12 +162,14 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+              <label htmlFor="expense-date" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Expense Date *
               </label>
               <div className="relative">
                 <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
+                  id="expense-date"
+                  name="expense_date"
                   type="date"
                   required
                   value={formData.expense_date}
@@ -161,10 +181,12 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+            <label htmlFor="expense-category" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
               Category *
             </label>
             <select
+              id="expense-category"
+              name="category"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               className="w-full px-3 py-2.5 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
@@ -176,10 +198,12 @@ export default function ExpenseModal({ isOpen, onClose, tripId, expenseToEdit, o
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+            <label htmlFor="expense-notes" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
               Receipt Notes
             </label>
             <textarea
+              id="expense-notes"
+              name="notes"
               rows="2"
               placeholder="e.g., Paid via GCash / Shared expense with travel companion"
               value={formData.notes}

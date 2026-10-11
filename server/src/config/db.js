@@ -257,7 +257,7 @@ async function seedDefaultData() {
     await query(
       `INSERT INTO itinerary_activities (trip_id, day_number, activity_date, time_slot, title, location, notes, estimated_cost, category)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [demoTripId, 1, '02:00 PM', '2026-11-15', 'Sunset Kayaking', 'Las Cabañas Beach', 'Paddle board and enjoy seaside smoothie.', 800.00, 'relaxation']
+      [demoTripId, 1, '2026-11-15', '02:00 PM', 'Sunset Kayaking', 'Las Cabañas Beach', 'Paddle board and enjoy seaside smoothie.', 800.00, 'relaxation']
     );
     await query(
       `INSERT INTO itinerary_activities (trip_id, day_number, activity_date, time_slot, title, location, notes, estimated_cost, category)

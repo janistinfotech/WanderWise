@@ -48,7 +48,7 @@ const initialDestinations = [
     region: "Central Visayas",
     country: "Philippines",
     description: "Historical landmarks, heart-pumping Kawasan Falls canyoneering, swimming with millions of sardines, and Bantayan island beaches.",
-    image_url: "https://images.unsplash.com/photo-1582650625119-3a31f8418b7d?auto=format&fit=crop&w=1000&q=80",
+    image_url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=80",
     best_season: "Dry Season (Jan-May)",
     estimated_daily_cost: 2800.00,
     tags: "Canyoneering, Heritage, Marine Life, Beaches",

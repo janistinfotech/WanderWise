@@ -49,7 +49,7 @@ async function getFavorites(req, res) {
   try {
     const userId = req.user.id;
     const result = await query(
-      `SELECT d.*, 1 as is_favorite
+      `SELECT d.*, true as is_favorite
        FROM destinations d
        JOIN favorite_destinations f ON d.id = f.destination_id
        WHERE f.user_id = $1
@@ -57,7 +57,7 @@ async function getFavorites(req, res) {
       [userId]
     );
 
-    res.json({ success: true, favorites: result.rows });
+    res.json({ success: true, favorites: result.rows.map(r => ({ ...r, is_favorite: true })) });
   } catch (err) {
     console.error('Get favorites error:', err);
     res.status(500).json({ success: false, message: 'Server error fetching favorites.' });
@@ -68,6 +68,14 @@ async function toggleFavorite(req, res) {
   try {
     const userId = req.user.id;
     const destinationId = parseInt(req.params.id, 10);
+    if (isNaN(destinationId)) {
+      return res.status(400).json({ success: false, message: 'Invalid destination ID.' });
+    }
+
+    const destCheck = await query('SELECT id FROM destinations WHERE id = $1', [destinationId]);
+    if (destCheck.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Destination not found.' });
+    }
 
     const existing = await query(
       'SELECT id FROM favorite_destinations WHERE user_id = $1 AND destination_id = $2',

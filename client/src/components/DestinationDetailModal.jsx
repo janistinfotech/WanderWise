@@ -16,18 +16,37 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function DestinationDetailModal({ onToggleFavorite }) {
-  const { selectedDestination, closeDestinationDetail, openCreateTrip, formatCurrency } = useApp();
+  const { selectedDestination, closeDestinationDetail, openCreateTrip, formatCurrency, toggleFavoriteDestination } = useApp();
+
+  React.useEffect(() => {
+    if (!selectedDestination) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeDestinationDetail();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedDestination, closeDestinationDetail]);
 
   if (!selectedDestination) return null;
 
   const dest = selectedDestination;
   const tagsList = (dest.tags || '').split(',').map((t) => t.trim()).filter(Boolean);
 
-  const sampleHighlights = [
-    'Breathtaking crystal clear waters & protected marine sanctuaries',
-    'Scenic local dining featuring fresh seafood & regional delicacies',
-    'Perfect for adventure seekers, couples, and photography lovers',
-    'Eco-tourism compliant with accredited tour guides',
+  const handleFavoriteClick = () => {
+    if (onToggleFavorite) {
+      onToggleFavorite(dest.id);
+    } else if (toggleFavoriteDestination) {
+      toggleFavoriteDestination(dest.id);
+    }
+  };
+
+  const destinationHighlights = [
+    `Located in the ${dest.region || 'scenic'} region of ${dest.country || 'the Philippines'}`,
+    `Optimal travel window: ${dest.best_season || 'Year-round exploration'}`,
+    `Average daily travel spend: ${formatCurrency(dest.estimated_daily_cost)} per person`,
+    `Community rating: ${dest.rating || '4.8'} / 5.0 traveler score`,
   ];
 
   const handlePlanTrip = () => {
@@ -58,7 +77,8 @@ export default function DestinationDetailModal({ onToggleFavorite }) {
             <button
               onClick={closeDestinationDetail}
               className="absolute top-4 right-4 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition"
-              aria-label="Close details"
+              aria-label="Close modal"
+              title="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -146,10 +166,10 @@ export default function DestinationDetailModal({ onToggleFavorite }) {
             {/* Travel Highlights List */}
             <div>
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 dark:text-dark-muted mb-2.5">
-                Why Travelers Love It
+                Key Travel Highlights
               </h4>
               <div className="space-y-2">
-                {sampleHighlights.map((hl, i) => (
+                {destinationHighlights.map((hl, i) => (
                   <div key={i} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300">
                     <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
                     <span>{hl}</span>
@@ -160,20 +180,18 @@ export default function DestinationDetailModal({ onToggleFavorite }) {
 
             {/* Action Bar */}
             <div className="pt-4 border-t border-slate-100 dark:border-dark-border flex flex-col sm:flex-row items-center justify-between gap-3">
-              {onToggleFavorite && (
-                <button
-                  type="button"
-                  onClick={() => onToggleFavorite(dest.id)}
-                  className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border font-bold text-xs transition ${
-                    dest.is_favorite
-                      ? 'bg-coral-50 dark:bg-coral-950/30 border-coral-200 text-coral-600'
-                      : 'border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-dark-card'
-                  }`}
-                >
-                  <Heart className={`w-4 h-4 ${dest.is_favorite ? 'fill-coral-500 text-coral-500' : ''}`} />
-                  <span>{dest.is_favorite ? 'Saved in Favorites' : 'Add to Favorites'}</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleFavoriteClick}
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border font-bold text-xs transition ${
+                  dest.is_favorite
+                    ? 'bg-coral-50 dark:bg-coral-950/30 border-coral-200 text-coral-600'
+                    : 'border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-dark-card'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${dest.is_favorite ? 'fill-coral-500 text-coral-500' : ''}`} />
+                <span>{dest.is_favorite ? 'Saved in Favorites' : 'Add to Favorites'}</span>
+              </button>
 
               <button
                 type="button"

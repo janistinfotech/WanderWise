@@ -136,12 +136,13 @@ export default function RegisterPage({ onGoLogin, onGoLanding }) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label htmlFor="register-name" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Full Name *
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                 <input
+                  id="register-name"
                   type="text"
                   required
                   placeholder="e.g., Juan dela Cruz"
@@ -153,12 +154,13 @@ export default function RegisterPage({ onGoLogin, onGoLanding }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label htmlFor="register-email" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Email Address *
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                 <input
+                  id="register-email"
                   type="email"
                   required
                   placeholder="juan@example.com"
@@ -170,12 +172,13 @@ export default function RegisterPage({ onGoLogin, onGoLanding }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label htmlFor="register-password" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Password (6+ characters) *
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                 <input
+                  id="register-password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   minLength={6}
@@ -197,10 +200,11 @@ export default function RegisterPage({ onGoLogin, onGoLanding }) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-travel-style" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   Travel Style
                 </label>
                 <select
+                  id="register-travel-style"
                   value={formData.travel_style}
                   onChange={(e) => setFormData({ ...formData, travel_style: e.target.value })}
                   className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
@@ -214,10 +218,11 @@ export default function RegisterPage({ onGoLogin, onGoLanding }) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-currency" className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   Currency
                 </label>
                 <select
+                  id="register-currency"
                   value={formData.currency}
                   onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                   className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-navy-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"

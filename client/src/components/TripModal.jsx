@@ -56,6 +56,17 @@ export default function TripModal() {
     setError('');
   }, [tripToEdit, prefilledDestination, tripModalOpen]);
 
+  useEffect(() => {
+    if (!tripModalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeTripModal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [tripModalOpen, closeTripModal]);
+
   if (!tripModalOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -144,6 +155,7 @@ export default function TripModal() {
             </label>
             <input
               type="text"
+              name="title"
               required
               placeholder="e.g., Summer Escapade in Palawan"
               value={formData.title}
@@ -160,6 +172,7 @@ export default function TripModal() {
               <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
               <input
                 type="text"
+                name="destination"
                 required
                 placeholder="e.g., El Nido & Coron, Palawan"
                 value={formData.destination}
@@ -178,6 +191,7 @@ export default function TripModal() {
                 <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="date"
+                  name="start_date"
                   required
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
@@ -194,6 +208,7 @@ export default function TripModal() {
                 <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="date"
+                  name="end_date"
                   required
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
@@ -212,6 +227,7 @@ export default function TripModal() {
                 <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="number"
+                  name="estimated_budget"
                   min="0"
                   step="0.01"
                   placeholder="e.g., 25000"
