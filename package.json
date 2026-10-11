@@ -1,6 +1,6 @@
 {
   "name": "wanderwise",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "WanderWise — Smart Travel Planner and Itinerary Management System",
   "private": true,
   "scripts": {

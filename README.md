@@ -1,6 +1,6 @@
 # 🧭 WanderWise — Smart Travel Planner and Itinerary Management System
 
-[![CI/CD Pipeline](https://github.com/YOUR_GITHUB_USERNAME/WanderWise/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/WanderWise/actions)
+[![CI/CD Pipeline](https://github.com/janistinfotech/WanderWise/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/janistinfotech/WanderWise/actions)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-blue.svg)](https://www.docker.com/)
 [![Node](https://img.shields.io/badge/Node.js-v20+-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-Vite-61dafb.svg)](https://react.dev/)
@@ -14,8 +14,8 @@
 ---
 
 ## 🔗 Live Application & Repository Links
-- **GitHub Repository**: `https://github.com/YOUR_GITHUB_USERNAME/WanderWise` *(Replace with your link)*
-- **Live Deployed Web Application**: `https://wanderwise-app.onrender.com` *(Replace with your live Render URL)*
+- **GitHub Repository**: `https://github.com/janistinfotech/WanderWise`
+- **Live Deployed Web Application**: `https://wanderwise-app-asun.onrender.com`
 - **DevOps Documentation**: See [DEVOPS_DOCUMENTATION.md](./DEVOPS_DOCUMENTATION.md) for step-by-step rubric evaluation and screenshot locations.
 
 ---
@@ -58,7 +58,7 @@
 ### 7. ⚙️ Settings & System Information
 - Profile customization: Full Name, Travel Style, Avatar URL, and Bio.
 - Currency switcher (**PHP ₱**, **USD $**, **EUR €**, **SGD S$**, **JPY ¥**).
-- DevOps specification display showing application version **v1.0.0**, Docker status, and CI/CD parameters.
+- DevOps specification display showing application version **v1.1.0**, Docker status, and CI/CD parameters.
 
 ---
 
@@ -135,7 +135,7 @@ WanderWise/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_GITHUB_USERNAME/WanderWise.git
+   git clone https://github.com/janistinfotech/WanderWise.git
    cd WanderWise
    ```
 

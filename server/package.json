@@ -1,6 +1,6 @@
 {
   "name": "wanderwise-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Backend API for WanderWise Smart Travel Planner",
   "main": "src/index.js",
   "scripts": {

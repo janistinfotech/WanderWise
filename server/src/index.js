@@ -26,7 +26,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     application: 'WanderWise — Smart Travel Planner and Itinerary Management System',
-    version: '1.0.0',
+    version: '1.1.0',
     timestamp: new Date().toISOString(),
     database: getDbType(),
     environment: process.env.NODE_ENV || 'development'

@@ -237,7 +237,7 @@ export default function LandingPage({ onGoLogin, onGoRegister }) {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-dark-border py-8 text-center text-xs text-slate-500 dark:text-dark-muted">
-        <p>© 2026 WanderWise. Smart Travel Planner & Itinerary Management System. Version 1.0.0.</p>
+        <p>© 2026 WanderWise. Smart Travel Planner & Itinerary Management System. Version 1.1.0 — Live Journey Update.</p>
       </footer>
     </div>
   );

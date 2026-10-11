@@ -9,8 +9,8 @@
 - **Student Name / Group**: *[Insert Your Name / Group Members Here]*
 - **Course & Section**: *[Insert Course Code & Section Here]*
 - **Date**: October 2026
-- **Repository URL**: `https://github.com/YOUR_GITHUB_USERNAME/WanderWise`
-- **Live Deployment URL**: `https://wanderwise-app.onrender.com`
+- **Repository URL**: `https://github.com/janistinfotech/WanderWise`
+- **Live Deployment URL**: `https://wanderwise-app-asun.onrender.com`
 
 ---
 
@@ -260,7 +260,7 @@ docker compose ps
 1. **Create a new GitHub repository** named `WanderWise`.
 2. **Push local commits to GitHub:**
    ```bash
-   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/WanderWise.git
+   git remote add origin https://github.com/janistinfotech/WanderWise.git
    git branch -M main
    git push -u origin main
    ```

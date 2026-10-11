@@ -26,12 +26,12 @@ test.after(async () => {
   }
 });
 
-test('Backend Health API returns healthy status and v1.0.0', async () => {
+test('Backend Health API returns healthy status and v1.1.0', async () => {
   const res = await fetch(`${baseUrl}/api/health`);
   assert.strictEqual(res.status, 200);
   const data = await res.json();
   assert.strictEqual(data.status, 'healthy');
-  assert.strictEqual(data.version, '1.0.0');
+  assert.strictEqual(data.version, '1.1.0');
   assert.ok(data.timestamp);
 });
 
