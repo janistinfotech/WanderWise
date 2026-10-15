@@ -7,6 +7,19 @@ let dbClient = null;
 let dbType = 'sqlite'; // 'postgres' or 'sqlite'
 let initPromise = null;
 
+function shouldUsePostgresSsl(databaseUrl) {
+  const sslMode = (process.env.PGSSLMODE || '').toLowerCase();
+  if (sslMode === 'disable') return false;
+  if (['require', 'verify-ca', 'verify-full'].includes(sslMode)) return true;
+
+  try {
+    const hostname = new URL(databaseUrl).hostname.toLowerCase();
+    return !['localhost', '127.0.0.1', '::1', 'postgres'].includes(hostname);
+  } catch {
+    return process.env.NODE_ENV === 'production';
+  }
+}
+
 /**
  * Initialize Database Connection
  * Attempts PostgreSQL first if DATABASE_URL or PGHOST is present.
@@ -27,9 +40,9 @@ async function initDb() {
         const poolConfig = databaseUrl
           ? {
               connectionString: databaseUrl,
-              ssl: databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1')
-                ? false
-                : { rejectUnauthorized: false },
+              ssl: shouldUsePostgresSsl(databaseUrl)
+                ? { rejectUnauthorized: false }
+                : false,
             }
           : {
               host: process.env.PGHOST || 'localhost',
