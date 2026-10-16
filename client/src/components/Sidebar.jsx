@@ -156,7 +156,7 @@ export default function Sidebar({ isOpen, onClose }) {
                   <span>DevOps Platform</span>
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-extrabold text-[10px] border border-teal-200/60 dark:border-teal-800/40">
-                  v1.1.0
+                  v1.1.1
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 dark:text-dark-muted">
@@ -164,9 +164,9 @@ export default function Sidebar({ isOpen, onClose }) {
               </p>
             </div>
           ) : (
-            <div className="flex justify-center mb-2" title="WanderWise v1.1.0 (Docker & PostgreSQL)">
+            <div className="flex justify-center mb-2" title="WanderWise v1.1.1 (Docker & PostgreSQL)">
               <span className="px-1.5 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-black text-[9px]">
-                v1.1.0
+                v1.1.1
               </span>
             </div>
           )}
